@@ -886,6 +886,7 @@ export function CreateStreamProcessorPage({ onBack, onCreateProcessor, viewMode 
   const [autoscalingEnabled, setAutoscalingEnabled] = useState(false)
   const [minTier, setMinTier] = useState('SP10')
   const [maxTier, setMaxTier] = useState('SP30')
+  const [startingTier, setStartingTier] = useState('SP10')
   const [sourceConnection, setSourceConnection] = useState(viewMode ? 'sample_solar' : '')
   const [sinkConnection, setSinkConnection] = useState(viewMode ? 'atlas_sink' : '')
   const [stages, setStages] = useState<Stage[]>(viewMode ? [
@@ -1384,9 +1385,10 @@ export function CreateStreamProcessorPage({ onBack, onCreateProcessor, viewMode 
                       <TextInput label="" aria-label="Stream processor name" value={processorName} onChange={e => setProcessorName(e.target.value)} disabled={!editMode} sizeVariant="small" />
                     </div>
                   </div>
-                  <Overline style={{ color: color.light.text.secondary.default, display: 'block', marginTop: spacing[400], marginBottom: spacing[400] }}>
-                    Tier configuration
-                  </Overline>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: spacing[200], marginTop: spacing[400], marginBottom: spacing[400] }}>
+                    <Overline style={{ color: color.light.text.secondary.default }}>Tier configuration</Overline>
+                    <Badge variant="lightgray">current tier : {viewProcessor?.currentTier ?? tier}</Badge>
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: spacing[600], marginBottom: spacing[400] }}>
                     <div>
                       <Body baseFontSize={13} style={{ fontWeight: 700, display: 'block', marginBottom: spacing[100] }}>Autoscaling</Body>
@@ -1419,6 +1421,19 @@ export function CreateStreamProcessorPage({ onBack, onCreateProcessor, viewMode 
                         </div>
                         <div className={viewFieldControlStyles}>
                           <Select label="" aria-label="Maximum tier" value={maxTier} onChange={setMaxTier} disabled={!editMode} size="small">
+                            {TIER_OPTIONS.map(t => (
+                              <Option key={t.value} value={t.value} description={`${t.description} ${t.price}`}>{t.label}</Option>
+                            ))}
+                          </Select>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: spacing[600] }}>
+                        <div>
+                          <Body baseFontSize={13} style={{ fontWeight: 700, display: 'block', marginBottom: spacing[100] }}>Starting tier</Body>
+                          <Body baseFontSize={13} style={{ color: color.light.text.secondary.default }}>The tier the stream processor will start at once autoscaling initiates.</Body>
+                        </div>
+                        <div className={viewFieldControlStyles}>
+                          <Select label="" aria-label="Starting tier" value={startingTier} onChange={setStartingTier} disabled={!editMode} size="small">
                             {TIER_OPTIONS.map(t => (
                               <Option key={t.value} value={t.value} description={`${t.description} ${t.price}`}>{t.label}</Option>
                             ))}
@@ -1474,6 +1489,7 @@ export function CreateStreamProcessorPage({ onBack, onCreateProcessor, viewMode 
                   </div>
                   </div>
                   {autoscalingEnabled ? (
+                    <>
                     <div style={{ display: 'flex', gap: spacing[400] }}>
                       <div style={{ flex: 1 }}>
                         <Select
@@ -1512,6 +1528,25 @@ export function CreateStreamProcessorPage({ onBack, onCreateProcessor, viewMode 
                         </Select>
                       </div>
                     </div>
+                    <div style={{ marginTop: spacing[100] }}>
+                      <Select
+                        label="Starting tier"
+                        description="The tier the stream processor will start at once autoscaling initiates. The workspace default tier has been pre-selected."
+                        value={startingTier}
+                        onChange={val => setStartingTier(val)}
+                        disabled={viewMode && !editMode}
+                      >
+                        {TIER_OPTIONS.map(t => (
+                          <Option key={t.value} value={t.value} description={t.description}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                              <span>{t.label}</span>
+                              <span data-tier-price style={{ color: palette.gray.dark1 }}>{t.price}</span>
+                            </div>
+                          </Option>
+                        ))}
+                      </Select>
+                    </div>
+                    </>
                   ) : (
                     <Select
                       label="Tier"

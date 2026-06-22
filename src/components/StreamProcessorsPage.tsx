@@ -142,6 +142,7 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
   const [startAfterCreation, setStartAfterCreation] = useState(true)
   const [minTier, setMinTier] = useState('SP10')
   const [maxTier, setMaxTier] = useState('SP30')
+  const [startingTier, setStartingTier] = useState('')
   const [isStarting, setIsStarting] = useState(false)
 
   const hasChanges = clearCheckpoint || selectedDate !== null || timeValue.trim() !== '' || newTier !== ''
@@ -155,6 +156,7 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
     setStartAfterCreation(true)
     setMinTier('SP10')
     setMaxTier('SP30')
+    setStartingTier('')
     setIsStarting(false)
     onClose()
   }
@@ -175,7 +177,7 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
         </div>
       ) : (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-        <H3 style={{ marginBottom: 8 }}>Advanced startWith configuration</H3>
+        <H3 style={{ marginBottom: 8 }}>startWith options</H3>
         <Body baseFontSize={13} style={{ marginBottom: 24 }}>
           To understand the different startWith operations, view our{' '}
           <Link href="#">documentation<Icon glyph="OpenNewTab" size="small" style={{ marginLeft: 2 }} /></Link>.
@@ -268,6 +270,7 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
         </div>
 
         {startAfterCreation ? (
+          <>
           <div style={{ display: 'flex', gap: spacing[400] }}>
             <div style={{ flex: 1 }}>
               <Select
@@ -304,6 +307,24 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
               </Select>
             </div>
           </div>
+          <div style={{ marginTop: spacing[400] }}>
+            <Select
+              label="Starting tier"
+              description="The tier the stream processor will start at once autoscaling initiates."
+              value={startingTier}
+              onChange={setStartingTier}
+            >
+              {TIER_OPTIONS.map(t => (
+                <Option key={t.value} value={t.value} description={t.description}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <span>{t.label}</span>
+                    <span data-tier-price style={{ color: palette.gray.dark1 }}>{t.price}</span>
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          </div>
+          </>
         ) : (
           <>
             <Body baseFontSize={13} style={{ fontWeight: 700, display: 'block', marginBottom: 8 }}>New tier</Body>
@@ -374,7 +395,7 @@ function ActionsCell({
           description={status === 'RUNNING' ? 'Processor must be stopped before configuring.' : undefined}
           onClick={onAdvancedStart}
         >
-          Advanced Start
+          startWith options
         </MenuItem>
         <MenuItem
           variant="destructive"
@@ -510,7 +531,7 @@ export function StreamProcessorsPage({
                   description={processor.status === 'RUNNING' ? 'Processor must be stopped before configuring.' : undefined}
                   onClick={() => { setAdvancedStartTier(processor.currentTier); setAdvancedStartProcessorName(processor.name); setAdvancedStartOpen(true) }}
                 >
-                  Advanced Start
+                  startWith options
                 </MenuItem>
                 <MenuItem
                   variant="destructive"
