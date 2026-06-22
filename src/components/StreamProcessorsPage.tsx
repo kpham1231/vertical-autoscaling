@@ -170,7 +170,7 @@ function AdvancedStartModal({ open, onClose, currentTier, processorName: _proces
   }
 
   return (
-    <Modal open={open} setOpen={(v) => { if (!v && !isStarting) handleClose() }} size="default">
+    <Modal open={open} setOpen={(v) => { if (!v && !isStarting) handleClose() }} size="large" scrollable>
       {isStarting ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 280 }}>
           <PageLoader description="Starting processor..." />
